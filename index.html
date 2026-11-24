@@ -428,7 +428,7 @@
         const now = ctx.currentTime + .015;
         const master = ctx.createGain();
         master.gain.setValueAtTime(.0001, now);
-        master.gain.exponentialRampToValueAtTime(.80, now + .018);
+        master.gain.exponentialRampToValueAtTime(1.8, now + .018);
         master.gain.exponentialRampToValueAtTime(.0001, now + (finale ? 1.18 : .72));
         master.connect(ctx.destination);
 

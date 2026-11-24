@@ -1,553 +1,540 @@
 <!doctype html>
 <html lang="nl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#047857" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f766e">
   <title>Huis to-do · Luuk & Vera</title>
   <style>
     :root {
-      --bg: #f7f7f4;
-      --card: #ffffff;
-      --text: #1c1917;
-      --muted: #78716c;
-      --line: #e7e5e4;
-      --green: #059669;
-      --green-dark: #047857;
-      --green-soft: #ecfdf5;
-      --red: #dc2626;
-      --shadow: 0 8px 30px rgba(28, 25, 23, .06);
-      color-scheme: light;
+      --bg: #f7f7f2;
+      --card: rgba(255,255,255,.92);
+      --ink: #18201e;
+      --muted: #6c7773;
+      --line: #e1e6e2;
+      --brand: #0f766e;
+      --brand-2: #22a06b;
+      --brand-soft: #e7f7f1;
+      --danger: #c2413b;
+      --shadow: 0 12px 35px rgba(32, 54, 48, .08);
+      --radius: 22px;
     }
-
     * { box-sizing: border-box; }
-    html { -webkit-text-size-adjust: 100%; }
+    html { background: var(--bg); }
     body {
       margin: 0;
       min-height: 100vh;
+      color: var(--ink);
       background:
-        radial-gradient(circle at top right, rgba(16,185,129,.10), transparent 26rem),
+        radial-gradient(circle at 9% 0%, rgba(54, 211, 153, .14), transparent 28rem),
+        radial-gradient(circle at 100% 16%, rgba(251, 191, 36, .12), transparent 24rem),
         var(--bg);
-      color: var(--text);
-      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
     }
     button, input, select { font: inherit; }
     button { -webkit-tap-highlight-color: transparent; }
-    .app { width: min(760px, 100%); margin: 0 auto; padding: 28px 16px 60px; }
-    .title-row { display: flex; align-items: center; gap: 12px; }
-    .home-icon {
-      width: 46px; height: 46px; display: grid; place-items: center;
-      border-radius: 16px; background: var(--green); color: white;
-      box-shadow: 0 8px 18px rgba(5,150,105,.23); font-size: 24px;
+    .shell { width: min(760px, calc(100% - 28px)); margin: 0 auto; padding: 28px 0 58px; }
+    .hero { margin-bottom: 22px; }
+    .title-row { display: flex; align-items: center; gap: 13px; }
+    .home-mark {
+      width: 48px; height: 48px; display: grid; place-items: center;
+      color: white; font-size: 24px; border-radius: 16px;
+      background: linear-gradient(145deg, var(--brand-2), var(--brand));
+      box-shadow: 0 10px 25px rgba(15,118,110,.22);
     }
-    h1 { margin: 0; font-size: clamp(1.7rem, 6vw, 2.35rem); letter-spacing: -.035em; line-height: 1.05; }
-    .subtitle { margin: 9px 0 0 58px; color: var(--muted); }
+    h1 { margin: 0; font-size: clamp(28px, 7vw, 38px); letter-spacing: -.045em; line-height: 1; }
+    .subtitle { color: var(--muted); margin: 9px 0 0 61px; font-size: 15px; }
     .progress-card {
-      margin-top: 22px; background: rgba(255,255,255,.92); border: 1px solid var(--line);
-      border-radius: 20px; padding: 17px; box-shadow: var(--shadow);
+      margin-top: 22px; padding: 17px 18px; border: 1px solid var(--line);
+      background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
     }
-    .progress-copy { display: flex; justify-content: space-between; gap: 12px; font-size: .92rem; }
-    .progress-copy strong { font-weight: 750; }
-    .progress-track { height: 12px; margin-top: 10px; border-radius: 999px; overflow: hidden; background: #f1f0ee; }
-    .progress-bar { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg,#10b981,#059669); transition: width .35s ease; }
-
-    .toolbar { display: flex; gap: 9px; flex-wrap: wrap; margin: 18px 0 22px; }
+    .progress-copy { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 10px; }
+    .progress-copy strong { font-size: 15px; }
+    .progress-copy span { color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; }
+    .track { height: 12px; border-radius: 999px; overflow: hidden; background: #edf0ed; }
+    .bar { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #10b981, #22c55e); transition: width .45s cubic-bezier(.22,.9,.28,1); }
+    .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; margin: 18px 0 24px; }
     .btn {
-      border: 1px solid var(--line); border-radius: 13px; padding: 10px 14px;
-      background: white; color: var(--text); cursor: pointer; font-weight: 700;
-      box-shadow: 0 3px 14px rgba(28,25,23,.04); transition: transform .12s, background .12s;
+      border: 1px solid var(--line); border-radius: 14px; min-height: 42px; padding: 9px 13px;
+      background: rgba(255,255,255,.88); color: var(--ink); font-weight: 700; font-size: 14px;
+      cursor: pointer; box-shadow: 0 4px 12px rgba(22,45,38,.05); transition: transform .15s, background .15s, border-color .15s;
     }
-    .btn:hover { background: #fafaf9; }
+    .btn:hover { background: #fff; border-color: #cbd4cf; }
     .btn:active { transform: scale(.97); }
-    .btn.primary { background: var(--green); color: white; border-color: var(--green); }
-    .btn.primary:hover { background: var(--green-dark); }
-    .btn.icon { width: 43px; padding: 10px; }
-    .btn.danger { color: var(--red); }
-    .btn:disabled { opacity: .55; cursor: wait; }
-
-    .notice { display: none; margin-bottom: 18px; padding: 13px 15px; border-radius: 14px; font-size: .92rem; }
-    .notice.show { display: block; }
-    .notice.error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
-    .notice.info { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; }
-    .loading { padding: 26px 0; text-align: center; color: var(--muted); }
-    .spinner { display: inline-block; width: 20px; height: 20px; margin-right: 8px; vertical-align: -4px; border: 3px solid #d6d3d1; border-top-color: var(--green); border-radius: 50%; animation: spin .8s linear infinite; }
+    .btn.primary { color: white; background: var(--brand); border-color: var(--brand); padding-inline: 16px; }
+    .btn.primary:hover { background: #0b675f; }
+    .btn.icon { width: 42px; padding: 0; display: grid; place-items: center; font-size: 18px; }
+    .btn.muted { color: var(--muted); }
+    .sync-state { margin-left: auto; color: var(--muted); font-size: 12px; white-space: nowrap; }
+    .sync-state.busy::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 7px; border: 2px solid #a7b3ae; border-top-color: var(--brand); border-radius: 50%; animation: spin .75s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    .section { margin-top: 24px; }
-    .section-heading { display: flex; align-items: baseline; gap: 9px; margin: 0 2px 9px; }
-    .section-heading h2 { margin: 0; font-size: 1.24rem; letter-spacing: -.02em; }
-    .section-heading span { font-size: .78rem; color: #a8a29e; }
-    .section.carry .section-heading h2 { color: #9a3412; }
-    .section.carry .task-list { border-color: #fed7aa; }
-    .task-list { background: var(--card); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; box-shadow: var(--shadow); }
-    .task-row { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; padding: 14px; border-bottom: 1px solid #f1f0ee; }
-    .task-row:last-child { border-bottom: 0; }
-    .task-row:hover { background: #fcfcfb; }
+    .notice { padding: 13px 15px; margin-bottom: 18px; border-radius: 15px; font-size: 14px; line-height: 1.45; }
+    .notice.error { color: #8b2622; background: #fff0ef; border: 1px solid #f3c5c1; }
+    .notice.info { color: #315c50; background: #ecf8f3; border: 1px solid #c9eadd; }
+    .hidden { display: none !important; }
+    .groups { display: grid; gap: 24px; }
+    .group-head { display: flex; align-items: baseline; gap: 9px; margin: 0 3px 9px; }
+    .group-head h2 { margin: 0; font-size: 20px; letter-spacing: -.025em; }
+    .group-head span { color: #929b97; font-size: 12px; }
+    .group.carry .group-head h2 { color: #8b5f08; }
+    .group.carry .task-list { border-color: #f2d79d; background: rgba(255,252,242,.94); }
+    .task-list { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); box-shadow: var(--shadow); }
+    .task { display: grid; grid-template-columns: 42px 1fr auto; align-items: center; min-height: 66px; padding: 8px 10px 8px 8px; border-bottom: 1px solid #edf0ee; }
+    .task:last-child { border-bottom: 0; }
+    .task:hover { background: rgba(247,250,248,.72); }
     .check {
-      appearance: none; width: 27px; height: 27px; margin: 0; border: 2px solid #c7c3bf;
-      border-radius: 9px; display: grid; place-items: center; cursor: pointer; flex: 0 0 auto;
-      transition: background .15s, border-color .15s, transform .12s;
+      width: 42px; height: 48px; display: grid; place-items: center; border: 0; background: transparent; cursor: pointer;
     }
-    .check:active { transform: scale(.9); }
-    .check:checked { background: var(--green); border-color: var(--green); }
-    .check:checked::after { content: "✓"; color: white; font-size: 18px; font-weight: 900; line-height: 1; }
-    .task-main { min-width: 0; }
-    .task-text { line-height: 1.3; overflow-wrap: anywhere; }
-    .task-row.done .task-text { color: #a8a29e; text-decoration: line-through; }
-    .task-meta { margin-top: 4px; color: #a8a29e; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
-    .edit-btn { border: 0; background: transparent; color: #78716c; border-radius: 9px; padding: 8px; cursor: pointer; font-size: 17px; }
-    .edit-btn:hover { background: #f5f5f4; color: var(--text); }
-    .empty { background: white; border: 1px dashed #d6d3d1; border-radius: 18px; padding: 34px 20px; text-align: center; color: var(--muted); }
-    footer { text-align: center; color: #a8a29e; font-size: .77rem; margin-top: 38px; }
-
-    dialog { border: 0; border-radius: 22px; padding: 0; width: min(92vw, 480px); box-shadow: 0 24px 80px rgba(0,0,0,.25); }
-    dialog::backdrop { background: rgba(28,25,23,.48); backdrop-filter: blur(2px); }
-    .modal { padding: 22px; }
-    .modal h2 { margin: 0 0 19px; font-size: 1.35rem; }
-    .field { display: grid; gap: 7px; margin-bottom: 16px; }
-    .field label { font-size: .82rem; font-weight: 800; color: #57534e; }
-    .field input, .field select { width: 100%; border: 1px solid #d6d3d1; border-radius: 12px; padding: 12px 13px; color: var(--text); background: white; outline: none; }
-    .field input:focus, .field select:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(5,150,105,.13); }
-    .modal-actions { display: flex; justify-content: space-between; gap: 10px; margin-top: 22px; }
-    .modal-actions-right { display: flex; gap: 9px; margin-left: auto; }
-    #deleteBtn[hidden] { display: none; }
-    #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 1000; overflow: hidden; }
-    .confetti-piece { position: absolute; top: -20px; width: 10px; height: 18px; border-radius: 3px; animation: fall var(--duration) cubic-bezier(.15,.65,.4,1) forwards; }
-    @keyframes fall { to { transform: translate3d(var(--drift), 110vh, 0) rotate(var(--spin)); opacity: .95; } }
-
-    @media (max-width: 520px) {
-      .app { padding-top: 20px; }
+    .check-box {
+      width: 25px; height: 25px; display: grid; place-items: center; border: 2px solid #bdc7c2; border-radius: 9px; color: white;
+      transition: transform .2s cubic-bezier(.2,1.6,.4,1), background .15s, border-color .15s;
+    }
+    .check:hover .check-box { border-color: var(--brand-2); }
+    .task.done .check-box { background: #16a36f; border-color: #16a36f; transform: scale(1.04); }
+    .check-box svg { width: 16px; opacity: 0; transform: scale(.4) rotate(-10deg); transition: opacity .15s, transform .22s cubic-bezier(.2,1.7,.3,1); }
+    .task.done .check-box svg { opacity: 1; transform: scale(1) rotate(0); }
+    .task-text { min-width: 0; padding: 8px 4px; font-size: 15px; line-height: 1.35; overflow-wrap: anywhere; }
+    .task.done .task-text { color: #929b97; text-decoration: line-through; text-decoration-thickness: 1.5px; }
+    .task-actions { display: flex; gap: 2px; opacity: .7; }
+    .task:hover .task-actions, .task-actions:focus-within { opacity: 1; }
+    .action {
+      width: 36px; height: 36px; display: grid; place-items: center; border: 0; border-radius: 11px; background: transparent; color: #718079; cursor: pointer;
+    }
+    .action:hover { background: #edf3f0; color: var(--brand); }
+    .action.delete:hover { background: #fff0ef; color: var(--danger); }
+    .empty { text-align: center; color: var(--muted); padding: 48px 20px; border: 1px dashed #cbd5d0; border-radius: var(--radius); background: rgba(255,255,255,.5); }
+    .empty .emoji { display: block; font-size: 34px; margin-bottom: 8px; }
+    footer { margin-top: 34px; color: #929b97; text-align: center; font-size: 12px; }
+    dialog { width: min(460px, calc(100% - 24px)); padding: 0; border: 0; border-radius: 24px; box-shadow: 0 30px 80px rgba(20,35,30,.25); }
+    dialog::backdrop { background: rgba(14,27,23,.48); backdrop-filter: blur(3px); }
+    .modal { padding: 24px; }
+    .modal h2 { margin: 0 0 20px; letter-spacing: -.03em; }
+    .field { display: grid; gap: 7px; margin-bottom: 15px; }
+    .field label { font-size: 13px; font-weight: 750; color: #4e5b57; }
+    .field input, .field select { width: 100%; border: 1px solid #cfd8d3; border-radius: 13px; padding: 12px 13px; color: var(--ink); background: #fff; outline: 0; }
+    .field input:focus, .field select:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(15,118,110,.12); }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 22px; }
+    #confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; }
+    .celebrate {
+      position: fixed; left: 50%; top: 21%; translate: -50% -50%; z-index: 101; pointer-events: none;
+      padding: 13px 20px; border-radius: 999px; color: white; font-weight: 900; letter-spacing: -.02em;
+      background: linear-gradient(135deg, #0f766e, #22a06b); box-shadow: 0 15px 45px rgba(15,118,110,.3);
+      animation: celebrate 2.35s both cubic-bezier(.2,.9,.2,1);
+    }
+    @keyframes celebrate { 0% { opacity: 0; transform: scale(.55) translateY(14px); } 13%,78% { opacity: 1; transform: scale(1) translateY(0); } 100% { opacity: 0; transform: scale(.9) translateY(-16px); } }
+    @media (max-width: 560px) {
+      .shell { width: min(100% - 20px, 760px); padding-top: 20px; }
       .subtitle { margin-left: 0; }
-      .toolbar .btn.primary { flex: 1; }
-      .task-row { padding: 13px 12px; }
+      .toolbar { gap: 7px; }
+      .sync-state { width: 100%; margin: 2px 4px 0; }
+      .task { grid-template-columns: 42px 1fr auto; }
+      .task-actions { opacity: 1; }
+      .action { width: 32px; }
+      .modal { padding: 21px; }
     }
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
     }
   </style>
 </head>
 <body>
-  <main class="app">
-    <header>
-      <div class="title-row">
-        <div class="home-icon" aria-hidden="true">⌂</div>
-        <h1>Huis to-do 🏠</h1>
-      </div>
-      <p class="subtitle">Luuk & Vera · samen doen, samen klaar</p>
-
-      <div class="progress-card" aria-label="Voortgang">
-        <div class="progress-copy"><strong id="progressText">0 van 0 klaar</strong><span id="progressPct">0%</span></div>
-        <div class="progress-track"><div id="progressBar" class="progress-bar"></div></div>
+  <canvas id="confetti" aria-hidden="true"></canvas>
+  <main class="shell">
+    <header class="hero">
+      <div class="title-row"><div class="home-mark" aria-hidden="true">⌂</div><h1>Huis to-do 🏠</h1></div>
+      <p class="subtitle">Luuk & Vera · samen gedaan krijgen</p>
+      <div class="progress-card">
+        <div class="progress-copy"><strong id="progressText">Taken laden…</strong><span id="progressPct">0%</span></div>
+        <div class="track"><div class="bar" id="progressBar"></div></div>
       </div>
     </header>
 
-    <div class="toolbar">
-      <button id="addBtn" class="btn primary" type="button">＋ Nieuwe taak</button>
-      <button id="hideBtn" class="btn" type="button">Verberg afgevinkt</button>
-      <button id="refreshBtn" class="btn icon" type="button" title="Lijst verversen" aria-label="Lijst verversen">↻</button>
-    </div>
+    <nav class="toolbar" aria-label="Acties">
+      <button class="btn primary" id="addBtn">＋ Nieuwe taak</button>
+      <button class="btn" id="hideBtn">Verberg afgevinkt</button>
+      <button class="btn icon" id="soundBtn" title="Geluid aan of uit" aria-label="Geluid aan of uit">🔊</button>
+      <button class="btn icon" id="refreshBtn" title="Ververs lijst" aria-label="Ververs lijst">↻</button>
+      <span class="sync-state" id="syncState">Nog niet bijgewerkt</span>
+    </nav>
 
-    <div id="notice" class="notice" role="status"></div>
-    <div id="loading" class="loading"><span class="spinner"></span>Taken laden…</div>
-    <div id="content"></div>
-
-    <footer>Tik op een vinkje voor een kleine TADAAA. Wijzigingen worden gedeeld via Supabase.</footer>
+    <div id="error" class="notice error hidden" role="alert"></div>
+    <div id="info" class="notice info hidden"></div>
+    <div id="groups" class="groups" aria-live="polite"></div>
+    <div id="empty" class="empty hidden"><span class="emoji">✨</span>Geen taken om te tonen.</div>
+    <footer>Wijzigingen worden gedeeld via Supabase · automatische weekwissel op maandag</footer>
   </main>
 
   <dialog id="taskDialog">
-    <form id="taskForm" class="modal" method="dialog">
+    <form class="modal" id="taskForm">
       <h2 id="dialogTitle">Nieuwe taak</h2>
       <div class="field">
         <label for="taskInput">Wat moet er gebeuren?</label>
-        <input id="taskInput" name="task" maxlength="180" autocomplete="off" required />
+        <input id="taskInput" name="task" maxlength="180" required autocomplete="off" placeholder="Bijv. planten water geven">
       </div>
       <div class="field">
         <label for="dayInput">Dag</label>
         <select id="dayInput" name="day">
-          <option value="MA">Maandag</option>
-          <option value="DI">Dinsdag</option>
-          <option value="WOE">Woensdag</option>
-          <option value="DO">Donderdag</option>
-          <option value="VRIJ">Vrijdag</option>
-          <option value="OVERIG">Nog inplannen</option>
+          <option value="MA">Maandag</option><option value="DI">Dinsdag</option><option value="WOE">Woensdag</option>
+          <option value="DO">Donderdag</option><option value="VRIJ">Vrijdag</option><option value="OVERIG">Nog inplannen</option>
         </select>
       </div>
       <div class="modal-actions">
-        <button id="deleteBtn" class="btn danger" type="button" hidden>Verwijderen</button>
-        <div class="modal-actions-right">
-          <button id="cancelBtn" class="btn" type="button">Annuleren</button>
-          <button id="saveBtn" class="btn primary" type="submit">Opslaan</button>
-        </div>
+        <button type="button" class="btn" id="cancelBtn">Annuleren</button>
+        <button type="submit" class="btn primary" id="saveBtn">Opslaan</button>
       </div>
     </form>
   </dialog>
 
-  <div id="confetti" aria-hidden="true"></div>
-
   <script>
-    "use strict";
-
     const SUPABASE_URL = "https://ljqbfvwuzyiragabldra.supabase.co";
     const SUPABASE_KEY = "sb_publishable_vNbIKhJuDJNLaQjhMnxovQ_8ibTHXSc";
     const API = `${SUPABASE_URL}/rest/v1/tasks`;
-    const DAYS = ["MA", "DI", "WOE", "DO", "VRIJ", "OVERIG", "KLAAR"];
-    const DAY_NAMES = {
-      MA: "Maandag", DI: "Dinsdag", WOE: "Woensdag", DO: "Donderdag",
-      VRIJ: "Vrijdag", OVERIG: "Nog inplannen", KLAAR: "Al gedaan"
-    };
+    const DAYS = ["MA", "DI", "WOE", "DO", "VRIJ", "OVERIG"];
+    const DAY_NAMES = { MA: "Maandag", DI: "Dinsdag", WOE: "Woensdag", DO: "Donderdag", VRIJ: "Vrijdag", OVERIG: "Nog inplannen" };
 
-    let tasks = [];
+    let items = [];
     let hideDone = false;
     let editingId = null;
+    let soundOn = localStorage.getItem("huisTodoSound") !== "off";
+    let loading = false;
     let audioContext = null;
 
-    const $ = (selector) => document.querySelector(selector);
-    const content = $("#content");
-    const notice = $("#notice");
-    const loading = $("#loading");
-    const dialog = $("#taskDialog");
-    const taskForm = $("#taskForm");
-    const taskInput = $("#taskInput");
-    const dayInput = $("#dayInput");
+    const $ = (id) => document.getElementById(id);
+    const groupsEl = $("groups");
+    const emptyEl = $("empty");
+    const errorEl = $("error");
+    const infoEl = $("info");
+    const dialog = $("taskDialog");
 
-    function apiHeaders(extra = {}) {
-      return {
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${SUPABASE_KEY}`,
-        "Content-Type": "application/json",
-        ...extra
-      };
+    function headers(extra = {}) {
+      return { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", ...extra };
+    }
+
+    function localDateString(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+
+    function currentWeekStart() {
+      const d = new Date();
+      d.setHours(12, 0, 0, 0);
+      const day = d.getDay() || 7;
+      d.setDate(d.getDate() - day + 1);
+      return localDateString(d);
     }
 
     async function request(url, options = {}) {
-      const response = await fetch(url, {
-        ...options,
-        headers: apiHeaders(options.headers || {})
-      });
+      const response = await fetch(url, { ...options, headers: headers(options.headers || {}) });
       if (!response.ok) {
-        let detail = `${response.status} ${response.statusText}`;
-        try {
-          const body = await response.json();
-          detail = body.message || body.hint || body.details || detail;
-        } catch (_) {}
-        throw new Error(detail);
+        const detail = await response.text();
+        let message = detail;
+        try { message = JSON.parse(detail).message || detail; } catch (_) {}
+        throw new Error(message || `Fout ${response.status}`);
       }
-      if (response.status === 204) return null;
+      if (response.status === 204 || response.headers.get("content-length") === "0") return null;
       const text = await response.text();
       return text ? JSON.parse(text) : null;
     }
 
-    function localDateString(date) {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-      const day = String(date.getDate()).padStart(2, "0");
-      return `${year}-${month}-${day}`;
-    }
-
-    function currentMonday() {
-      const now = new Date();
-      const day = now.getDay();
-      const diff = day === 0 ? -6 : 1 - day;
-      const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diff, 12);
-      return localDateString(monday);
-    }
-
-    function setNotice(message = "", type = "info") {
-      notice.textContent = message;
-      notice.className = `notice ${message ? "show" : ""} ${type}`;
-    }
-
-    function setBusy(isBusy) {
-      $("#refreshBtn").disabled = isBusy;
-      loading.style.display = isBusy ? "block" : "none";
-    }
-
     async function loadTasks({ quiet = false } = {}) {
-      if (!quiet) setBusy(true);
-      setNotice();
+      if (loading) return;
+      loading = true;
+      if (!quiet) setSync("Taken laden…", true);
+      clearError();
       try {
-        const select = encodeURIComponent("id,task,day,done,week_start,carried_over,created_at");
-        const rows = await request(`${API}?select=${select}&order=id.asc`);
-        tasks = Array.isArray(rows) ? rows : [];
-        await rollOverOldTasks();
+        let data = await request(`${API}?select=id,task,day,done,week_start,carried_over&order=id.asc`);
+        const monday = currentWeekStart();
+        const carry = data.filter((x) => x.week_start && x.week_start < monday && !x.done);
+        if (carry.length) {
+          setSync(`${carry.length} taak${carry.length === 1 ? "" : "taken"} doorschuiven…`, true);
+          await Promise.all(carry.map((x) => request(`${API}?id=eq.${encodeURIComponent(x.id)}`, {
+            method: "PATCH",
+            headers: { Prefer: "return=minimal" },
+            body: JSON.stringify({ week_start: monday, carried_over: true })
+          })));
+          data = await request(`${API}?select=id,task,day,done,week_start,carried_over&order=id.asc`);
+          showInfo(`${carry.length} openstaande taak${carry.length === 1 ? " is" : "taken zijn"} meegenomen van vorige week.`);
+        }
+        items = data;
         render();
-      } catch (error) {
-        setNotice(`Laden lukt niet: ${error.message}`, "error");
+        setSync(`Bijgewerkt om ${new Date().toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" })}`);
+      } catch (err) {
+        showError(`Laden lukt niet: ${friendlyError(err)}`);
+        setSync("Bijwerken mislukt");
       } finally {
-        setBusy(false);
+        loading = false;
       }
     }
 
-    async function rollOverOldTasks() {
-      const week = currentMonday();
-      const oldOpen = tasks.filter((task) => !task.done && task.week_start && task.week_start < week);
-      if (!oldOpen.length) return;
-
-      const updates = oldOpen.map(async (task) => {
-        await request(`${API}?id=eq.${encodeURIComponent(task.id)}`, {
-          method: "PATCH",
-          headers: { Prefer: "return=minimal" },
-          body: JSON.stringify({ week_start: week, carried_over: true })
-        });
-        task.week_start = week;
-        task.carried_over = true;
-      });
-      await Promise.all(updates);
-      setNotice(`${oldOpen.length} openstaande ${oldOpen.length === 1 ? "taak is" : "taken zijn"} meegenomen uit vorige week.`, "info");
-    }
-
-    function activeTasks() {
-      const week = currentMonday();
-      return tasks.filter((task) => task.week_start === week || (!task.week_start && !task.done));
+    function activeItems() {
+      const monday = currentWeekStart();
+      return items.filter((x) => !x.week_start || x.week_start === monday);
     }
 
     function render() {
-      const active = activeTasks();
-      const completed = active.filter((task) => task.done).length;
-      const pct = active.length ? Math.round((completed / active.length) * 100) : 0;
-      $("#progressText").textContent = `${completed} van ${active.length} klaar`;
-      $("#progressPct").textContent = `${pct}%`;
-      $("#progressBar").style.width = `${pct}%`;
-      $("#hideBtn").textContent = hideDone ? "Toon afgevinkt" : "Verberg afgevinkt";
+      const active = activeItems();
+      const done = active.filter((x) => x.done).length;
+      const pct = active.length ? Math.round(done / active.length * 100) : 0;
+      $("progressText").textContent = `${done} van ${active.length} klaar`;
+      $("progressPct").textContent = `${pct}%`;
+      $("progressBar").style.width = `${pct}%`;
+      $("hideBtn").textContent = hideDone ? "Toon afgevinkt" : "Verberg afgevinkt";
+      $("soundBtn").textContent = soundOn ? "🔊" : "🔇";
+      $("soundBtn").setAttribute("aria-label", soundOn ? "Geluid uitzetten" : "Geluid aanzetten");
 
-      content.replaceChildren();
-      const visible = active.filter((task) => !hideDone || !task.done);
-      const regular = visible.filter((task) => !task.carried_over);
-      const carried = visible.filter((task) => task.carried_over);
+      const visible = active.filter((x) => !hideDone || !x.done);
+      const regular = visible.filter((x) => !x.carried_over);
+      const carried = visible.filter((x) => x.carried_over);
+      const blocks = [];
 
-      for (const day of DAYS) {
-        const items = regular.filter((task) => (task.day || "OVERIG") === day);
-        if (items.length) content.appendChild(makeSection(DAY_NAMES[day], items, false));
-      }
+      DAYS.forEach((day) => {
+        const dayItems = regular.filter((x) => x.day === day);
+        if (dayItems.length) blocks.push(groupMarkup(DAY_NAMES[day] || day, dayItems, false));
+      });
+      const unknown = regular.filter((x) => !DAYS.includes(x.day));
+      if (unknown.length) blocks.push(groupMarkup("Overig", unknown, false));
+      if (carried.length) blocks.push(groupMarkup("Resterend van vorige week", carried, true));
 
-      const unknown = regular.filter((task) => !DAYS.includes(task.day || "OVERIG"));
-      if (unknown.length) content.appendChild(makeSection("Nog inplannen", unknown, false));
-      if (carried.length) content.appendChild(makeSection("Resterend van vorige week", carried, true));
-
-      if (!visible.length) {
-        const empty = document.createElement("div");
-        empty.className = "empty";
-        empty.textContent = active.length && hideDone
-          ? "Alles is afgevinkt. Toon afgevinkte taken om ze te bekijken."
-          : "Nog geen taken. Voeg er eentje toe!";
-        content.appendChild(empty);
-      }
+      groupsEl.innerHTML = blocks.join("");
+      emptyEl.classList.toggle("hidden", visible.length !== 0);
+      bindTaskActions();
     }
 
-    function makeSection(title, items, isCarry) {
-      const section = document.createElement("section");
-      section.className = `section${isCarry ? " carry" : ""}`;
-
-      const heading = document.createElement("div");
-      heading.className = "section-heading";
-      const h2 = document.createElement("h2");
-      h2.textContent = title;
-      const count = document.createElement("span");
-      count.textContent = `${items.length} ${items.length === 1 ? "ding" : "dingen"}`;
-      heading.append(h2, count);
-
-      const list = document.createElement("div");
-      list.className = "task-list";
-      items.forEach((task) => list.appendChild(makeTaskRow(task, isCarry)));
-      section.append(heading, list);
-      return section;
+    function groupMarkup(title, list, carry) {
+      const noun = list.length === 1 ? "taak" : "taken";
+      return `<section class="group${carry ? " carry" : ""}">
+        <div class="group-head"><h2>${escapeHtml(title)}</h2><span>${list.length} ${noun}</span></div>
+        <div class="task-list">${list.map(taskMarkup).join("")}</div>
+      </section>`;
     }
 
-    function makeTaskRow(task, showDay) {
-      const row = document.createElement("div");
-      row.className = `task-row${task.done ? " done" : ""}`;
-
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.className = "check";
-      checkbox.checked = Boolean(task.done);
-      checkbox.setAttribute("aria-label", `${task.done ? "Maak open" : "Vink af"}: ${task.task}`);
-      checkbox.addEventListener("change", () => toggleTask(task, checkbox));
-
-      const main = document.createElement("div");
-      main.className = "task-main";
-      const text = document.createElement("div");
-      text.className = "task-text";
-      text.textContent = task.task;
-      main.appendChild(text);
-      if (showDay) {
-        const meta = document.createElement("div");
-        meta.className = "task-meta";
-        meta.textContent = DAY_NAMES[task.day] || "Nog inplannen";
-        main.appendChild(meta);
-      }
-
-      const edit = document.createElement("button");
-      edit.type = "button";
-      edit.className = "edit-btn";
-      edit.title = "Taak aanpassen";
-      edit.setAttribute("aria-label", `Taak aanpassen: ${task.task}`);
-      edit.textContent = "✎";
-      edit.addEventListener("click", () => openEdit(task));
-
-      row.append(checkbox, main, edit);
-      return row;
+    function taskMarkup(item) {
+      return `<article class="task${item.done ? " done" : ""}" data-id="${item.id}">
+        <button class="check" data-action="toggle" aria-label="${item.done ? "Taak weer openen" : "Taak afvinken"}">
+          <span class="check-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg></span>
+        </button>
+        <div class="task-text">${escapeHtml(item.task)}</div>
+        <div class="task-actions">
+          <button class="action" data-action="edit" title="Taak aanpassen" aria-label="Taak aanpassen">✎</button>
+          <button class="action delete" data-action="delete" title="Taak verwijderen" aria-label="Taak verwijderen">×</button>
+        </div>
+      </article>`;
     }
 
-    async function toggleTask(task, checkbox) {
-      const previous = Boolean(task.done);
-      const next = !previous;
-      task.done = next;
-      if (next) playTada();
-      render();
-
-      try {
-        await request(`${API}?id=eq.${encodeURIComponent(task.id)}`, {
-          method: "PATCH",
-          headers: { Prefer: "return=minimal" },
-          body: JSON.stringify({ done: next })
+    function bindTaskActions() {
+      groupsEl.querySelectorAll("[data-action]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const row = button.closest(".task");
+          const item = items.find((x) => String(x.id) === row.dataset.id);
+          if (!item) return;
+          const action = button.dataset.action;
+          if (action === "toggle") toggleTask(item);
+          if (action === "edit") openDialog(item);
+          if (action === "delete") deleteTask(item);
         });
-        if (next && activeTasks().length > 0 && activeTasks().every((item) => item.done)) launchConfetti();
-      } catch (error) {
-        task.done = previous;
-        checkbox.checked = previous;
+      });
+    }
+
+    async function toggleTask(item) {
+      const next = !item.done;
+      const active = activeItems();
+      const willCompleteAll = next && active.length > 0 && active.every((x) => x.id === item.id || x.done);
+      item.done = next;
+      render();
+      if (next) playRewardSound(willCompleteAll);
+      if (willCompleteAll) celebrate();
+      try {
+        await request(`${API}?id=eq.${encodeURIComponent(item.id)}`, {
+          method: "PATCH", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ done: next })
+        });
+        setSync("Opgeslagen ✓");
+      } catch (err) {
+        item.done = !next;
         render();
-        setNotice(`Opslaan lukt niet: ${error.message}`, "error");
+        showError(`Opslaan lukt niet: ${friendlyError(err)}`);
       }
     }
 
-    function openNew() {
-      editingId = null;
-      $("#dialogTitle").textContent = "Nieuwe taak";
-      taskInput.value = "";
-      dayInput.value = "OVERIG";
-      $("#deleteBtn").hidden = true;
+    function openDialog(item = null) {
+      editingId = item ? item.id : null;
+      $("dialogTitle").textContent = item ? "Taak aanpassen" : "Nieuwe taak";
+      $("taskInput").value = item ? item.task : "";
+      $("dayInput").value = item && DAYS.includes(item.day) ? item.day : "MA";
       dialog.showModal();
-      setTimeout(() => taskInput.focus(), 0);
+      setTimeout(() => $("taskInput").focus(), 40);
     }
 
-    function openEdit(task) {
-      editingId = task.id;
-      $("#dialogTitle").textContent = "Taak aanpassen";
-      taskInput.value = task.task;
-      dayInput.value = DAYS.includes(task.day) && task.day !== "KLAAR" ? task.day : "OVERIG";
-      $("#deleteBtn").hidden = false;
-      dialog.showModal();
-      setTimeout(() => taskInput.focus(), 0);
-    }
-
-    taskForm.addEventListener("submit", async (event) => {
+    async function saveTask(event) {
       event.preventDefault();
-      const text = taskInput.value.trim();
-      if (!text) return taskInput.focus();
-      const day = dayInput.value;
-      const saveBtn = $("#saveBtn");
-      saveBtn.disabled = true;
-
+      const task = $("taskInput").value.trim();
+      const day = $("dayInput").value;
+      if (!task) return;
+      $("saveBtn").disabled = true;
       try {
-        if (editingId === null) {
-          const inserted = await request(API, {
-            method: "POST",
-            headers: { Prefer: "return=representation" },
-            body: JSON.stringify({
-              task: text,
-              day,
-              done: false,
-              week_start: currentMonday(),
-              carried_over: false
-            })
+        if (editingId !== null) {
+          const updated = await request(`${API}?id=eq.${encodeURIComponent(editingId)}`, {
+            method: "PATCH", headers: { Prefer: "return=representation" }, body: JSON.stringify({ task, day })
           });
-          if (Array.isArray(inserted) && inserted[0]) tasks.push(inserted[0]);
-          else await loadTasks({ quiet: true });
+          const index = items.findIndex((x) => x.id === editingId);
+          if (index >= 0 && updated && updated[0]) items[index] = updated[0];
         } else {
-          await request(`${API}?id=eq.${encodeURIComponent(editingId)}`, {
-            method: "PATCH",
-            headers: { Prefer: "return=minimal" },
-            body: JSON.stringify({ task: text, day })
+          const created = await request(API, {
+            method: "POST", headers: { Prefer: "return=representation" },
+            body: JSON.stringify({ task, day, done: false, week_start: currentWeekStart(), carried_over: false })
           });
-          const task = tasks.find((item) => String(item.id) === String(editingId));
-          if (task) Object.assign(task, { task: text, day });
+          if (created && created[0]) items.push(created[0]);
         }
         dialog.close();
         render();
-      } catch (error) {
-        setNotice(`Opslaan lukt niet: ${error.message}`, "error");
+        setSync("Opgeslagen ✓");
+      } catch (err) {
+        showError(`Opslaan lukt niet: ${friendlyError(err)}`);
       } finally {
-        saveBtn.disabled = false;
+        $("saveBtn").disabled = false;
       }
-    });
+    }
 
-    $("#deleteBtn").addEventListener("click", async () => {
-      const task = tasks.find((item) => String(item.id) === String(editingId));
-      if (!task || !confirm(`“${task.task}” verwijderen?`)) return;
-      $("#deleteBtn").disabled = true;
+    async function deleteTask(item) {
+      if (!confirm(`“${item.task}” verwijderen?`)) return;
+      const old = items;
+      items = items.filter((x) => x.id !== item.id);
+      render();
       try {
-        await request(`${API}?id=eq.${encodeURIComponent(task.id)}`, {
-          method: "DELETE",
-          headers: { Prefer: "return=minimal" }
-        });
-        tasks = tasks.filter((item) => String(item.id) !== String(task.id));
-        dialog.close();
+        await request(`${API}?id=eq.${encodeURIComponent(item.id)}`, { method: "DELETE", headers: { Prefer: "return=minimal" } });
+        setSync("Verwijderd");
+      } catch (err) {
+        items = old;
         render();
-      } catch (error) {
-        setNotice(`Verwijderen lukt niet: ${error.message}`, "error");
-      } finally {
-        $("#deleteBtn").disabled = false;
+        showError(`Verwijderen lukt niet: ${friendlyError(err)}`);
       }
-    });
+    }
 
-    $("#cancelBtn").addEventListener("click", () => dialog.close());
-    $("#addBtn").addEventListener("click", openNew);
-    $("#hideBtn").addEventListener("click", () => { hideDone = !hideDone; render(); });
-    $("#refreshBtn").addEventListener("click", () => loadTasks());
-    dialog.addEventListener("click", (event) => {
-      if (event.target === dialog) dialog.close();
-    });
-
-    function playTada() {
+    // Origineel, rechtenvrij beloningsgeluid: een zachte pop met oplopende arcade-sparkle.
+    function playRewardSound(finale = false) {
+      if (!soundOn) return;
       try {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (!AudioCtx) return;
-        audioContext ||= new AudioCtx();
-        if (audioContext.state === "suspended") audioContext.resume();
-        const now = audioContext.currentTime;
-        const notes = [261.63, 329.63, 392.00, 523.25];
-        const starts = [0, .09, .18, .29];
-        const durations = [.16, .16, .18, .62];
+        audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
+        const ctx = audioContext;
+        if (ctx.state === "suspended") ctx.resume();
+        const now = ctx.currentTime + .015;
+        const master = ctx.createGain();
+        master.gain.setValueAtTime(.0001, now);
+        master.gain.exponentialRampToValueAtTime(.34, now + .018);
+        master.gain.exponentialRampToValueAtTime(.0001, now + (finale ? 1.18 : .72));
+        master.connect(ctx.destination);
 
-        notes.forEach((frequency, index) => {
-          const oscillator = audioContext.createOscillator();
-          const gain = audioContext.createGain();
-          oscillator.type = index === notes.length - 1 ? "triangle" : "sine";
-          oscillator.frequency.setValueAtTime(frequency, now + starts[index]);
-          gain.gain.setValueAtTime(.0001, now + starts[index]);
-          gain.gain.exponentialRampToValueAtTime(index === 3 ? .22 : .16, now + starts[index] + .018);
-          gain.gain.exponentialRampToValueAtTime(.0001, now + starts[index] + durations[index]);
-          oscillator.connect(gain).connect(audioContext.destination);
-          oscillator.start(now + starts[index]);
-          oscillator.stop(now + starts[index] + durations[index] + .03);
+        // Korte, ronde 'pop'.
+        const pop = ctx.createOscillator();
+        const popGain = ctx.createGain();
+        pop.type = "sine";
+        pop.frequency.setValueAtTime(185, now);
+        pop.frequency.exponentialRampToValueAtTime(92, now + .095);
+        popGain.gain.setValueAtTime(.42, now);
+        popGain.gain.exponentialRampToValueAtTime(.0001, now + .13);
+        pop.connect(popGain).connect(master);
+        pop.start(now); pop.stop(now + .14);
+
+        // Warme, oplopende tonen — bewust geen bestaand gamegeluid.
+        const notes = finale
+          ? [[523.25,0],[659.25,.09],[783.99,.18],[1046.5,.29],[1318.5,.43]]
+          : [[523.25,0],[659.25,.095],[783.99,.19],[1046.5,.30]];
+        notes.forEach(([freq, offset], index) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          const filter = ctx.createBiquadFilter();
+          osc.type = index % 2 ? "triangle" : "sine";
+          osc.frequency.setValueAtTime(freq, now + offset);
+          osc.detune.setValueAtTime(index % 2 ? 4 : -3, now + offset);
+          filter.type = "lowpass";
+          filter.frequency.setValueAtTime(2600, now + offset);
+          const peak = finale && index === notes.length - 1 ? .24 : .17;
+          gain.gain.setValueAtTime(.0001, now + offset);
+          gain.gain.exponentialRampToValueAtTime(peak, now + offset + .016);
+          gain.gain.exponentialRampToValueAtTime(.0001, now + offset + (finale && index === notes.length - 1 ? .56 : .27));
+          osc.connect(filter).connect(gain).connect(master);
+          osc.start(now + offset);
+          osc.stop(now + offset + .58);
         });
-      } catch (_) {
-        // Audio is decorative; a blocked AudioContext must never block task updates.
-      }
+
+        // Lichte sparkle aan het eind.
+        const sparkleAt = now + (finale ? .46 : .32);
+        [1568, 2093, 2637].forEach((freq, i) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = "sine";
+          osc.frequency.value = freq;
+          gain.gain.setValueAtTime(.0001, sparkleAt + i * .035);
+          gain.gain.exponentialRampToValueAtTime(.055, sparkleAt + i * .035 + .008);
+          gain.gain.exponentialRampToValueAtTime(.0001, sparkleAt + i * .035 + .16);
+          osc.connect(gain).connect(master);
+          osc.start(sparkleAt + i * .035); osc.stop(sparkleAt + i * .035 + .18);
+        });
+      } catch (_) { /* De lijst blijft werken als audio door de browser is geblokkeerd. */ }
     }
 
-    function launchConfetti() {
-      const host = $("#confetti");
-      host.replaceChildren();
-      const colors = ["#10b981", "#f59e0b", "#ef4444", "#3b82f6", "#8b5cf6", "#ec4899"];
-      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const amount = reducedMotion ? 24 : 110;
+    function celebrate() {
+      const label = document.createElement("div");
+      label.className = "celebrate";
+      label.textContent = "Alles klaar — lekker bezig! 🎉";
+      document.body.appendChild(label);
+      setTimeout(() => label.remove(), 2400);
 
-      for (let i = 0; i < amount; i += 1) {
-        const piece = document.createElement("i");
-        piece.className = "confetti-piece";
-        piece.style.left = `${Math.random() * 100}%`;
-        piece.style.background = colors[i % colors.length];
-        piece.style.setProperty("--duration", `${1.8 + Math.random() * 2.2}s`);
-        piece.style.setProperty("--drift", `${-110 + Math.random() * 220}px`);
-        piece.style.setProperty("--spin", `${360 + Math.random() * 1080}deg`);
-        piece.style.animationDelay = `${Math.random() * .45}s`;
-        host.appendChild(piece);
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      const canvas = $("confetti");
+      const ctx = canvas.getContext("2d");
+      const ratio = Math.min(devicePixelRatio || 1, 2);
+      canvas.width = innerWidth * ratio; canvas.height = innerHeight * ratio;
+      canvas.style.width = `${innerWidth}px`; canvas.style.height = `${innerHeight}px`;
+      ctx.scale(ratio, ratio);
+      const colors = ["#10b981", "#fbbf24", "#fb7185", "#60a5fa", "#a78bfa", "#ffffff"];
+      const pieces = Array.from({ length: 150 }, () => ({
+        x: innerWidth * (.18 + Math.random() * .64), y: -20 - Math.random() * innerHeight * .22,
+        vx: (Math.random() - .5) * 7, vy: 3 + Math.random() * 5, g: .075 + Math.random() * .07,
+        r: 4 + Math.random() * 5, rot: Math.random() * 6.3, vr: (Math.random() - .5) * .24,
+        color: colors[Math.floor(Math.random() * colors.length)]
+      }));
+      const start = performance.now();
+      function frame(t) {
+        ctx.clearRect(0, 0, innerWidth, innerHeight);
+        pieces.forEach((p) => {
+          p.x += p.vx; p.vy += p.g; p.y += p.vy; p.rot += p.vr;
+          ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.fillStyle = p.color;
+          ctx.fillRect(-p.r, -p.r * .55, p.r * 2, p.r * 1.1); ctx.restore();
+        });
+        if (t - start < 2600) requestAnimationFrame(frame); else ctx.clearRect(0, 0, innerWidth, innerHeight);
       }
-      setTimeout(() => host.replaceChildren(), 4700);
+      requestAnimationFrame(frame);
     }
 
+    function setSync(text, busy = false) { $("syncState").textContent = text; $("syncState").classList.toggle("busy", busy); }
+    function showError(text) { errorEl.textContent = text; errorEl.classList.remove("hidden"); }
+    function clearError() { errorEl.classList.add("hidden"); errorEl.textContent = ""; }
+    function showInfo(text) { infoEl.textContent = text; infoEl.classList.remove("hidden"); setTimeout(() => infoEl.classList.add("hidden"), 5500); }
+    function friendlyError(err) {
+      const text = String(err && err.message || err);
+      if (/failed to fetch/i.test(text)) return "geen verbinding met Supabase. Controleer je internetverbinding.";
+      if (/week_start|carried_over/i.test(text)) return "de weekkolommen ontbreken nog in Supabase.";
+      return text;
+    }
+    function escapeHtml(value) { return String(value ?? "").replace(/[&<>'"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[c])); }
+
+    $("addBtn").addEventListener("click", () => openDialog());
+    $("cancelBtn").addEventListener("click", () => dialog.close());
+    $("taskForm").addEventListener("submit", saveTask);
+    $("hideBtn").addEventListener("click", () => { hideDone = !hideDone; render(); });
+    $("refreshBtn").addEventListener("click", () => loadTasks());
+    $("soundBtn").addEventListener("click", () => {
+      soundOn = !soundOn;
+      localStorage.setItem("huisTodoSound", soundOn ? "on" : "off");
+      render();
+      if (soundOn) playRewardSound(false);
+    });
+    dialog.addEventListener("click", (event) => { if (event.target === dialog) dialog.close(); });
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) loadTasks({ quiet: true }); });
+    setInterval(() => loadTasks({ quiet: true }), 30000);
     loadTasks();
   </script>
 </body>

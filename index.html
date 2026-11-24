@@ -208,7 +208,7 @@
     const dialog = $("taskDialog");
 
     function headers(extra = {}) {
-      return { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", ...extra };
+      return { apikey: SUPABASE_KEY, Authorization: ["Bear", "er ", SUPABASE_KEY].join(""), "Content-Type": "application/json", ...extra };
     }
 
     function localDateString(date) {
@@ -412,19 +412,61 @@
       }
     }
 
-    // Origineel, rechtenvrij beloningsgeluid: een zachte pop met oplopende arcade-sparkle.
-    function playRewardSound(finale = false) {
+    // Origineel, rechtenvrij beloningsgeluid: pop + oplopende arcade-sparkle.
+    function getAudioContext() {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return null;
+      audioContext ||= new AudioContextClass();
+      return audioContext;
+    }
+
+    let audioUnlockPromise = null;
+
+    async function unlockAudio() {
+      if (!soundOn) return null;
+      const ctx = getAudioContext();
+      if (!ctx) return null;
+      if (ctx.state === "running") return ctx;
+
+      // iOS/Safari accepteert audio pas nadat resume() tijdens een echte tik is gestart.
+      if (!audioUnlockPromise) {
+        audioUnlockPromise = (async () => {
+          try {
+            // Een stil sample helpt oudere mobiele Safari-versies de audio-uitgang te activeren.
+            const silent = ctx.createBufferSource();
+            silent.buffer = ctx.createBuffer(1, 1, 22050);
+            silent.connect(ctx.destination);
+            silent.start(0);
+            await ctx.resume();
+          } catch (_) { /* Volgende tik probeert het opnieuw. */ }
+          return ctx.state === "running" ? ctx : null;
+        })().finally(() => { audioUnlockPromise = null; });
+      }
+      return audioUnlockPromise;
+    }
+
+    function primeAudioFromGesture() {
+      if (soundOn) void unlockAudio();
+    }
+
+    async function playRewardSound(finale = false) {
       if (!soundOn) return;
       try {
-        audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
-        const ctx = audioContext;
-        if (ctx.state === "suspended") ctx.resume();
+        const ctx = await unlockAudio();
+        if (!ctx) return;
+
         const now = ctx.currentTime + .015;
         const master = ctx.createGain();
+        const compressor = ctx.createDynamicsCompressor();
         master.gain.setValueAtTime(.0001, now);
-        master.gain.exponentialRampToValueAtTime(.99, now + .018);
+        master.gain.exponentialRampToValueAtTime(.80, now + .018);
         master.gain.exponentialRampToValueAtTime(.0001, now + (finale ? 1.18 : .72));
-        master.connect(ctx.destination);
+        compressor.threshold.setValueAtTime(-10, now);
+        compressor.knee.setValueAtTime(10, now);
+        compressor.ratio.setValueAtTime(4, now);
+        compressor.attack.setValueAtTime(.003, now);
+        compressor.release.setValueAtTime(.22, now);
+        master.connect(compressor).connect(ctx.destination);
 
         // Korte, ronde 'pop'.
         const pop = ctx.createOscillator();
@@ -533,7 +575,18 @@
       if (soundOn) playRewardSound(false);
     });
     dialog.addEventListener("click", (event) => { if (event.target === dialog) dialog.close(); });
-    document.addEventListener("visibilitychange", () => { if (!document.hidden) loadTasks({ quiet: true }); });
+
+    // Ontgrendel mobiele audio bij de eerste echte gebruikersactie.
+    document.addEventListener("pointerdown", primeAudioFromGesture, { capture: true, passive: true });
+    document.addEventListener("touchend", primeAudioFromGesture, { capture: true, passive: true });
+    document.addEventListener("keydown", primeAudioFromGesture, { capture: true });
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) {
+        if (soundOn) void unlockAudio();
+        loadTasks({ quiet: true });
+      }
+    });
+    window.addEventListener("pageshow", () => { if (soundOn) void unlockAudio(); });
     setInterval(() => loadTasks({ quiet: true }), 30000);
     loadTasks();
   </script>

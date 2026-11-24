@@ -1,26 +1,554 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Huis to-do</title>
-<style>
-:root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#292524;background:#fafaf9}*{box-sizing:border-box}body{margin:0}main{max-width:780px;margin:auto;padding:28px 16px 48px}.title{display:flex;gap:12px;align-items:center}.icon{width:43px;height:43px;border-radius:16px;background:#059669;color:white;display:grid;place-items:center;font-size:23px}h1{font-size:30px;margin:0}.sub{color:#78716c;margin:7px 0 0}.card{background:#fff;border:1px solid #e7e5e4;border-radius:18px;box-shadow:0 1px 3px #0000000d}.progress{margin-top:20px;padding:16px}.prow{display:flex;justify-content:space-between;font-size:14px}.bar{height:12px;background:#f5f5f4;border-radius:99px;overflow:hidden;margin-top:10px}.fill{height:100%;background:#10b981;border-radius:99px;transition:width .2s}.controls{display:flex;gap:8px;margin:18px 0;flex-wrap:wrap}button,input,select{font:inherit}.control,.primary{border:1px solid #e7e5e4;background:white;border-radius:12px;padding:10px 14px;cursor:pointer}.primary{background:#059669;color:white;border-color:#059669;font-weight:650}.day{margin:26px 0}h2{font-size:20px;margin:0 0 9px}.count{font-size:12px;color:#a8a29e;font-weight:400;margin-left:8px}.carry h2{color:#b45309}.carry .tasks{border-color:#f59e0b}.tasks{overflow:hidden}.taskrow{display:flex;align-items:center;border-bottom:1px solid #f5f5f4;background:white}.taskrow:last-child{border-bottom:0}.task{flex:1;display:flex;gap:12px;align-items:center;padding:15px;border:0;background:transparent;text-align:left;cursor:pointer;color:#292524}.taskrow:hover{background:#fafaf9}.box{width:24px;height:24px;border:2px solid #d6d3d1;border-radius:8px;display:grid;place-items:center;flex:none;font-weight:900}.task.done .box{background:#10b981;border-color:#10b981;color:white}.task.done .label{text-decoration:line-through;color:#a8a29e}.actions{display:flex;padding-right:10px}.iconbtn{border:0;background:transparent;padding:9px;cursor:pointer;color:#78716c;border-radius:9px}.iconbtn:hover{background:#f5f5f4;color:#292524}.error{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;padding:14px;border-radius:12px;margin-bottom:16px}.note{background:#fffbeb;color:#92400e;border:1px solid #fde68a;padding:12px;border-radius:12px;margin-bottom:16px}.muted{color:#78716c}.footer{text-align:center;color:#a8a29e;font-size:12px;margin-top:38px}.modalback{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;padding:16px;z-index:20}.modalback.open{display:flex}.modal{width:min(520px,100%);background:white;border-radius:18px;padding:20px}.modal h3{margin:0 0 16px}.field{display:flex;flex-direction:column;gap:6px;margin:12px 0}.field label{font-size:13px;font-weight:650}.field input,.field select{padding:11px;border:1px solid #d6d3d1;border-radius:10px}.modalactions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}.danger{color:#b91c1c}.confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50}.piece{position:absolute;top:-20px;width:10px;height:16px;animation:fall 3.2s linear forwards}@keyframes fall{to{transform:translate(var(--drift),110vh) rotate(900deg);opacity:.85}}@media(max-width:540px){h1{font-size:25px}main{padding-top:18px}.actions{padding-right:5px}.iconbtn{padding:8px 6px}}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#047857" />
+  <title>Huis to-do · Luuk & Vera</title>
+  <style>
+    :root {
+      --bg: #f7f7f4;
+      --card: #ffffff;
+      --text: #1c1917;
+      --muted: #78716c;
+      --line: #e7e5e4;
+      --green: #059669;
+      --green-dark: #047857;
+      --green-soft: #ecfdf5;
+      --red: #dc2626;
+      --shadow: 0 8px 30px rgba(28, 25, 23, .06);
+      color-scheme: light;
+    }
+
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top right, rgba(16,185,129,.10), transparent 26rem),
+        var(--bg);
+      color: var(--text);
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    button, input, select { font: inherit; }
+    button { -webkit-tap-highlight-color: transparent; }
+    .app { width: min(760px, 100%); margin: 0 auto; padding: 28px 16px 60px; }
+    .title-row { display: flex; align-items: center; gap: 12px; }
+    .home-icon {
+      width: 46px; height: 46px; display: grid; place-items: center;
+      border-radius: 16px; background: var(--green); color: white;
+      box-shadow: 0 8px 18px rgba(5,150,105,.23); font-size: 24px;
+    }
+    h1 { margin: 0; font-size: clamp(1.7rem, 6vw, 2.35rem); letter-spacing: -.035em; line-height: 1.05; }
+    .subtitle { margin: 9px 0 0 58px; color: var(--muted); }
+    .progress-card {
+      margin-top: 22px; background: rgba(255,255,255,.92); border: 1px solid var(--line);
+      border-radius: 20px; padding: 17px; box-shadow: var(--shadow);
+    }
+    .progress-copy { display: flex; justify-content: space-between; gap: 12px; font-size: .92rem; }
+    .progress-copy strong { font-weight: 750; }
+    .progress-track { height: 12px; margin-top: 10px; border-radius: 999px; overflow: hidden; background: #f1f0ee; }
+    .progress-bar { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg,#10b981,#059669); transition: width .35s ease; }
+
+    .toolbar { display: flex; gap: 9px; flex-wrap: wrap; margin: 18px 0 22px; }
+    .btn {
+      border: 1px solid var(--line); border-radius: 13px; padding: 10px 14px;
+      background: white; color: var(--text); cursor: pointer; font-weight: 700;
+      box-shadow: 0 3px 14px rgba(28,25,23,.04); transition: transform .12s, background .12s;
+    }
+    .btn:hover { background: #fafaf9; }
+    .btn:active { transform: scale(.97); }
+    .btn.primary { background: var(--green); color: white; border-color: var(--green); }
+    .btn.primary:hover { background: var(--green-dark); }
+    .btn.icon { width: 43px; padding: 10px; }
+    .btn.danger { color: var(--red); }
+    .btn:disabled { opacity: .55; cursor: wait; }
+
+    .notice { display: none; margin-bottom: 18px; padding: 13px 15px; border-radius: 14px; font-size: .92rem; }
+    .notice.show { display: block; }
+    .notice.error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+    .notice.info { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; }
+    .loading { padding: 26px 0; text-align: center; color: var(--muted); }
+    .spinner { display: inline-block; width: 20px; height: 20px; margin-right: 8px; vertical-align: -4px; border: 3px solid #d6d3d1; border-top-color: var(--green); border-radius: 50%; animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .section { margin-top: 24px; }
+    .section-heading { display: flex; align-items: baseline; gap: 9px; margin: 0 2px 9px; }
+    .section-heading h2 { margin: 0; font-size: 1.24rem; letter-spacing: -.02em; }
+    .section-heading span { font-size: .78rem; color: #a8a29e; }
+    .section.carry .section-heading h2 { color: #9a3412; }
+    .section.carry .task-list { border-color: #fed7aa; }
+    .task-list { background: var(--card); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; box-shadow: var(--shadow); }
+    .task-row { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; padding: 14px; border-bottom: 1px solid #f1f0ee; }
+    .task-row:last-child { border-bottom: 0; }
+    .task-row:hover { background: #fcfcfb; }
+    .check {
+      appearance: none; width: 27px; height: 27px; margin: 0; border: 2px solid #c7c3bf;
+      border-radius: 9px; display: grid; place-items: center; cursor: pointer; flex: 0 0 auto;
+      transition: background .15s, border-color .15s, transform .12s;
+    }
+    .check:active { transform: scale(.9); }
+    .check:checked { background: var(--green); border-color: var(--green); }
+    .check:checked::after { content: "✓"; color: white; font-size: 18px; font-weight: 900; line-height: 1; }
+    .task-main { min-width: 0; }
+    .task-text { line-height: 1.3; overflow-wrap: anywhere; }
+    .task-row.done .task-text { color: #a8a29e; text-decoration: line-through; }
+    .task-meta { margin-top: 4px; color: #a8a29e; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+    .edit-btn { border: 0; background: transparent; color: #78716c; border-radius: 9px; padding: 8px; cursor: pointer; font-size: 17px; }
+    .edit-btn:hover { background: #f5f5f4; color: var(--text); }
+    .empty { background: white; border: 1px dashed #d6d3d1; border-radius: 18px; padding: 34px 20px; text-align: center; color: var(--muted); }
+    footer { text-align: center; color: #a8a29e; font-size: .77rem; margin-top: 38px; }
+
+    dialog { border: 0; border-radius: 22px; padding: 0; width: min(92vw, 480px); box-shadow: 0 24px 80px rgba(0,0,0,.25); }
+    dialog::backdrop { background: rgba(28,25,23,.48); backdrop-filter: blur(2px); }
+    .modal { padding: 22px; }
+    .modal h2 { margin: 0 0 19px; font-size: 1.35rem; }
+    .field { display: grid; gap: 7px; margin-bottom: 16px; }
+    .field label { font-size: .82rem; font-weight: 800; color: #57534e; }
+    .field input, .field select { width: 100%; border: 1px solid #d6d3d1; border-radius: 12px; padding: 12px 13px; color: var(--text); background: white; outline: none; }
+    .field input:focus, .field select:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(5,150,105,.13); }
+    .modal-actions { display: flex; justify-content: space-between; gap: 10px; margin-top: 22px; }
+    .modal-actions-right { display: flex; gap: 9px; margin-left: auto; }
+    #deleteBtn[hidden] { display: none; }
+    #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 1000; overflow: hidden; }
+    .confetti-piece { position: absolute; top: -20px; width: 10px; height: 18px; border-radius: 3px; animation: fall var(--duration) cubic-bezier(.15,.65,.4,1) forwards; }
+    @keyframes fall { to { transform: translate3d(var(--drift), 110vh, 0) rotate(var(--spin)); opacity: .95; } }
+
+    @media (max-width: 520px) {
+      .app { padding-top: 20px; }
+      .subtitle { margin-left: 0; }
+      .toolbar .btn.primary { flex: 1; }
+      .task-row { padding: 13px 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
 </head>
 <body>
-<main><div class="title"><div class="icon">⌂</div><h1>Huis to-do 🏠</h1></div><p class="sub">Luuk & Vera · samen toevoegen, aanpassen en aftikken</p><div class="card progress"><div class="prow"><strong id="status">Taken laden…</strong><span id="pct">0%</span></div><div class="bar"><div class="fill" id="fill"></div></div></div><div class="controls"><button class="primary" id="add">＋ Nieuwe taak</button><button class="control" id="hide">Verberg afgevinkt</button><button class="control" id="refresh">↻ Verversen</button></div><div id="message"></div><div id="error"></div><div id="list" class="muted">Taken laden…</div><div class="footer">Iedere maandag schuiven openstaande taken automatisch door naar ‘Resterend van vorige week’.</div></main>
-<div class="modalback" id="modalback"><form class="modal" id="form"><h3 id="modaltitle">Nieuwe taak</h3><input type="hidden" id="editid"><div class="field"><label for="tasktext">Taak</label><input id="tasktext" required maxlength="160" placeholder="Wat moet er gebeuren?"></div><div class="field"><label for="day">Dag</label><select id="day"><option value="MA">Maandag</option><option value="DI">Dinsdag</option><option value="WOE">Woensdag</option><option value="DO">Donderdag</option><option value="VRIJ">Vrijdag</option><option value="OVERIG">Nog inplannen</option></select></div><div class="modalactions"><button type="button" class="control" id="cancel">Annuleren</button><button class="primary" type="submit">Opslaan</button></div></form></div><div class="confetti" id="confetti"></div>
-<script>
-const SUPABASE_URL='https://ljqbfvwuzyiragabldra.supabase.co',SUPABASE_KEY='sb_publishable_vNbIKhJuDJNLaQjhMnxovQ_8ibTHXSc',API=`${SUPABASE_URL}/rest/v1/tasks`,headers={apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json'},order=['MA','DI','WOE','DO','VRIJ','OVERIG'],names={MA:'Maandag',DI:'Dinsdag',WOE:'Woensdag',DO:'Donderdag',VRIJ:'Vrijdag',OVERIG:'Nog inplannen'};let items=[],hideDone=false,celebrated=false;const $=s=>document.querySelector(s);function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}function showError(m){$('#error').innerHTML=m?`<div class="error">${esc(m)}</div>`:''}function monday(){const d=new Date(),day=(d.getDay()+6)%7;d.setDate(d.getDate()-day);return d.toISOString().slice(0,10)}
-function confetti(){const c=$('#confetti'),colors=['#10b981','#f59e0b','#ec4899','#3b82f6','#8b5cf6'];c.innerHTML='';for(let i=0;i<110;i++){const p=document.createElement('i');p.className='piece';p.style.left=Math.random()*100+'vw';p.style.background=colors[i%colors.length];p.style.animationDelay=Math.random()*1.1+'s';p.style.setProperty('--drift',(Math.random()*240-120)+'px');c.appendChild(p)}setTimeout(()=>c.innerHTML='',4500)}
-function row(x){return `<div class="taskrow"><button class="task ${x.done?'done':''}" data-toggle="${x.id}"><span class="box">${x.done?'✓':''}</span><span class="label">${esc(x.task)}</span></button><div class="actions"><button class="iconbtn" title="Aanpassen" data-edit="${x.id}">✎</button><button class="iconbtn danger" title="Verwijderen" data-delete="${x.id}">🗑</button></div></div>`}
-function render(){const done=items.filter(x=>x.done).length,pct=items.length?Math.round(done/items.length*100):0;$('#status').textContent=`${done} van ${items.length} klaar`;$('#pct').textContent=`${pct}%`;$('#fill').style.width=`${pct}%`;$('#hide').textContent=hideDone?'Toon afgevinkt':'Verberg afgevinkt';if(items.length&&done===items.length&&!celebrated){celebrated=true;confetti()}if(done<items.length)celebrated=false;let out='';for(const day of order){const xs=items.filter(x=>!x.carried_over&&x.day===day&&(!hideDone||!x.done));if(xs.length)out+=`<section class="day"><h2>${names[day]}<span class="count">${xs.length} ${xs.length===1?'ding':'dingen'}</span></h2><div class="card tasks">${xs.map(row).join('')}</div></section>`}const carry=items.filter(x=>x.carried_over&&(!hideDone||!x.done));if(carry.length)out+=`<section class="day carry"><h2>Resterend van vorige week<span class="count">${carry.length} ${carry.length===1?'ding':'dingen'}</span></h2><div class="card tasks">${carry.map(row).join('')}</div></section>`;$('#list').innerHTML=out||'<span class="muted">Geen taken gevonden.</span>';document.querySelectorAll('[data-toggle]').forEach(b=>b.onclick=()=>toggle(+b.dataset.toggle));document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openEdit(+b.dataset.edit));document.querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>removeTask(+b.dataset.delete))}
-async function request(url,opt={}){const r=await fetch(url,opt);if(!r.ok)throw new Error(await r.text());return r}
-async function rollover(){const current=monday(),oldOpen=items.filter(x=>!x.done&&x.week_start!==current);for(const x of oldOpen)await patch(x.id,{week_start:current,carried_over:true});items=items.filter(x=>!x.done||x.week_start===current);if(oldOpen.length)$('#message').innerHTML=`<div class="note">Nieuwe week gestart: ${oldOpen.length} openstaande ${oldOpen.length===1?'taak is':'taken zijn'} doorgeschoven.</div>`}
-async function load(){showError('');try{const current=monday(),r=await request(`${API}?select=id,task,day,done,week_start,carried_over&or=(week_start.eq.${current},done.eq.false)&order=id.asc`,{headers});items=await r.json();await rollover();render()}catch(e){$('#list').innerHTML='';showError(`Laden lukt niet: ${e.message}`)}}
-async function patch(id,data){await request(`${API}?id=eq.${id}`,{method:'PATCH',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify(data)})}async function toggle(id){const x=items.find(i=>i.id===id),old=x.done;x.done=!old;render();try{await patch(id,{done:x.done})}catch(e){x.done=old;render();showError(`Opslaan lukt niet: ${e.message}`)}}
-function openNew(){$('#editid').value='';$('#tasktext').value='';$('#day').value='OVERIG';$('#modaltitle').textContent='Nieuwe taak';$('#modalback').classList.add('open');$('#tasktext').focus()}function openEdit(id){const x=items.find(i=>i.id===id);$('#editid').value=id;$('#tasktext').value=x.task;$('#day').value=x.day;$('#modaltitle').textContent='Taak aanpassen';$('#modalback').classList.add('open');$('#tasktext').focus()}function closeModal(){$('#modalback').classList.remove('open')}
-async function saveTask(e){e.preventDefault();showError('');const id=$('#editid').value,task=$('#tasktext').value.trim(),day=$('#day').value;if(!task)return;try{if(id){await patch(+id,{task,day});Object.assign(items.find(i=>i.id===+id),{task,day})}else{const r=await request(API,{method:'POST',headers:{...headers,Prefer:'return=representation'},body:JSON.stringify({task,day,done:false,week_start:monday(),carried_over:false})});items.push(...await r.json())}closeModal();render()}catch(e){showError(`Opslaan lukt niet: ${e.message}`);closeModal()}}
-async function removeTask(id){const x=items.find(i=>i.id===id);if(!confirm(`Taak verwijderen: “${x.task}”?`))return;try{await request(`${API}?id=eq.${id}`,{method:'DELETE',headers:{...headers,Prefer:'return=minimal'}});items=items.filter(i=>i.id!==id);render()}catch(e){showError(`Verwijderen lukt niet: ${e.message}`)}}
-$('#add').onclick=openNew;$('#cancel').onclick=closeModal;$('#form').onsubmit=saveTask;$('#hide').onclick=()=>{hideDone=!hideDone;render()};$('#refresh').onclick=load;$('#modalback').onclick=e=>{if(e.target===$('#modalback'))closeModal()};load();
-</script></body></html>
+  <main class="app">
+    <header>
+      <div class="title-row">
+        <div class="home-icon" aria-hidden="true">⌂</div>
+        <h1>Huis to-do 🏠</h1>
+      </div>
+      <p class="subtitle">Luuk & Vera · samen doen, samen klaar</p>
+
+      <div class="progress-card" aria-label="Voortgang">
+        <div class="progress-copy"><strong id="progressText">0 van 0 klaar</strong><span id="progressPct">0%</span></div>
+        <div class="progress-track"><div id="progressBar" class="progress-bar"></div></div>
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <button id="addBtn" class="btn primary" type="button">＋ Nieuwe taak</button>
+      <button id="hideBtn" class="btn" type="button">Verberg afgevinkt</button>
+      <button id="refreshBtn" class="btn icon" type="button" title="Lijst verversen" aria-label="Lijst verversen">↻</button>
+    </div>
+
+    <div id="notice" class="notice" role="status"></div>
+    <div id="loading" class="loading"><span class="spinner"></span>Taken laden…</div>
+    <div id="content"></div>
+
+    <footer>Tik op een vinkje voor een kleine TADAAA. Wijzigingen worden gedeeld via Supabase.</footer>
+  </main>
+
+  <dialog id="taskDialog">
+    <form id="taskForm" class="modal" method="dialog">
+      <h2 id="dialogTitle">Nieuwe taak</h2>
+      <div class="field">
+        <label for="taskInput">Wat moet er gebeuren?</label>
+        <input id="taskInput" name="task" maxlength="180" autocomplete="off" required />
+      </div>
+      <div class="field">
+        <label for="dayInput">Dag</label>
+        <select id="dayInput" name="day">
+          <option value="MA">Maandag</option>
+          <option value="DI">Dinsdag</option>
+          <option value="WOE">Woensdag</option>
+          <option value="DO">Donderdag</option>
+          <option value="VRIJ">Vrijdag</option>
+          <option value="OVERIG">Nog inplannen</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button id="deleteBtn" class="btn danger" type="button" hidden>Verwijderen</button>
+        <div class="modal-actions-right">
+          <button id="cancelBtn" class="btn" type="button">Annuleren</button>
+          <button id="saveBtn" class="btn primary" type="submit">Opslaan</button>
+        </div>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="confetti" aria-hidden="true"></div>
+
+  <script>
+    "use strict";
+
+    const SUPABASE_URL = "https://ljqbfvwuzyiragabldra.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_vNbIKhJuDJNLaQjhMnxovQ_8ibTHXSc";
+    const API = `${SUPABASE_URL}/rest/v1/tasks`;
+    const DAYS = ["MA", "DI", "WOE", "DO", "VRIJ", "OVERIG", "KLAAR"];
+    const DAY_NAMES = {
+      MA: "Maandag", DI: "Dinsdag", WOE: "Woensdag", DO: "Donderdag",
+      VRIJ: "Vrijdag", OVERIG: "Nog inplannen", KLAAR: "Al gedaan"
+    };
+
+    let tasks = [];
+    let hideDone = false;
+    let editingId = null;
+    let audioContext = null;
+
+    const $ = (selector) => document.querySelector(selector);
+    const content = $("#content");
+    const notice = $("#notice");
+    const loading = $("#loading");
+    const dialog = $("#taskDialog");
+    const taskForm = $("#taskForm");
+    const taskInput = $("#taskInput");
+    const dayInput = $("#dayInput");
+
+    function apiHeaders(extra = {}) {
+      return {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+        "Content-Type": "application/json",
+        ...extra
+      };
+    }
+
+    async function request(url, options = {}) {
+      const response = await fetch(url, {
+        ...options,
+        headers: apiHeaders(options.headers || {})
+      });
+      if (!response.ok) {
+        let detail = `${response.status} ${response.statusText}`;
+        try {
+          const body = await response.json();
+          detail = body.message || body.hint || body.details || detail;
+        } catch (_) {}
+        throw new Error(detail);
+      }
+      if (response.status === 204) return null;
+      const text = await response.text();
+      return text ? JSON.parse(text) : null;
+    }
+
+    function localDateString(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    function currentMonday() {
+      const now = new Date();
+      const day = now.getDay();
+      const diff = day === 0 ? -6 : 1 - day;
+      const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diff, 12);
+      return localDateString(monday);
+    }
+
+    function setNotice(message = "", type = "info") {
+      notice.textContent = message;
+      notice.className = `notice ${message ? "show" : ""} ${type}`;
+    }
+
+    function setBusy(isBusy) {
+      $("#refreshBtn").disabled = isBusy;
+      loading.style.display = isBusy ? "block" : "none";
+    }
+
+    async function loadTasks({ quiet = false } = {}) {
+      if (!quiet) setBusy(true);
+      setNotice();
+      try {
+        const select = encodeURIComponent("id,task,day,done,week_start,carried_over,created_at");
+        const rows = await request(`${API}?select=${select}&order=id.asc`);
+        tasks = Array.isArray(rows) ? rows : [];
+        await rollOverOldTasks();
+        render();
+      } catch (error) {
+        setNotice(`Laden lukt niet: ${error.message}`, "error");
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    async function rollOverOldTasks() {
+      const week = currentMonday();
+      const oldOpen = tasks.filter((task) => !task.done && task.week_start && task.week_start < week);
+      if (!oldOpen.length) return;
+
+      const updates = oldOpen.map(async (task) => {
+        await request(`${API}?id=eq.${encodeURIComponent(task.id)}`, {
+          method: "PATCH",
+          headers: { Prefer: "return=minimal" },
+          body: JSON.stringify({ week_start: week, carried_over: true })
+        });
+        task.week_start = week;
+        task.carried_over = true;
+      });
+      await Promise.all(updates);
+      setNotice(`${oldOpen.length} openstaande ${oldOpen.length === 1 ? "taak is" : "taken zijn"} meegenomen uit vorige week.`, "info");
+    }
+
+    function activeTasks() {
+      const week = currentMonday();
+      return tasks.filter((task) => task.week_start === week || (!task.week_start && !task.done));
+    }
+
+    function render() {
+      const active = activeTasks();
+      const completed = active.filter((task) => task.done).length;
+      const pct = active.length ? Math.round((completed / active.length) * 100) : 0;
+      $("#progressText").textContent = `${completed} van ${active.length} klaar`;
+      $("#progressPct").textContent = `${pct}%`;
+      $("#progressBar").style.width = `${pct}%`;
+      $("#hideBtn").textContent = hideDone ? "Toon afgevinkt" : "Verberg afgevinkt";
+
+      content.replaceChildren();
+      const visible = active.filter((task) => !hideDone || !task.done);
+      const regular = visible.filter((task) => !task.carried_over);
+      const carried = visible.filter((task) => task.carried_over);
+
+      for (const day of DAYS) {
+        const items = regular.filter((task) => (task.day || "OVERIG") === day);
+        if (items.length) content.appendChild(makeSection(DAY_NAMES[day], items, false));
+      }
+
+      const unknown = regular.filter((task) => !DAYS.includes(task.day || "OVERIG"));
+      if (unknown.length) content.appendChild(makeSection("Nog inplannen", unknown, false));
+      if (carried.length) content.appendChild(makeSection("Resterend van vorige week", carried, true));
+
+      if (!visible.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = active.length && hideDone
+          ? "Alles is afgevinkt. Toon afgevinkte taken om ze te bekijken."
+          : "Nog geen taken. Voeg er eentje toe!";
+        content.appendChild(empty);
+      }
+    }
+
+    function makeSection(title, items, isCarry) {
+      const section = document.createElement("section");
+      section.className = `section${isCarry ? " carry" : ""}`;
+
+      const heading = document.createElement("div");
+      heading.className = "section-heading";
+      const h2 = document.createElement("h2");
+      h2.textContent = title;
+      const count = document.createElement("span");
+      count.textContent = `${items.length} ${items.length === 1 ? "ding" : "dingen"}`;
+      heading.append(h2, count);
+
+      const list = document.createElement("div");
+      list.className = "task-list";
+      items.forEach((task) => list.appendChild(makeTaskRow(task, isCarry)));
+      section.append(heading, list);
+      return section;
+    }
+
+    function makeTaskRow(task, showDay) {
+      const row = document.createElement("div");
+      row.className = `task-row${task.done ? " done" : ""}`;
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.className = "check";
+      checkbox.checked = Boolean(task.done);
+      checkbox.setAttribute("aria-label", `${task.done ? "Maak open" : "Vink af"}: ${task.task}`);
+      checkbox.addEventListener("change", () => toggleTask(task, checkbox));
+
+      const main = document.createElement("div");
+      main.className = "task-main";
+      const text = document.createElement("div");
+      text.className = "task-text";
+      text.textContent = task.task;
+      main.appendChild(text);
+      if (showDay) {
+        const meta = document.createElement("div");
+        meta.className = "task-meta";
+        meta.textContent = DAY_NAMES[task.day] || "Nog inplannen";
+        main.appendChild(meta);
+      }
+
+      const edit = document.createElement("button");
+      edit.type = "button";
+      edit.className = "edit-btn";
+      edit.title = "Taak aanpassen";
+      edit.setAttribute("aria-label", `Taak aanpassen: ${task.task}`);
+      edit.textContent = "✎";
+      edit.addEventListener("click", () => openEdit(task));
+
+      row.append(checkbox, main, edit);
+      return row;
+    }
+
+    async function toggleTask(task, checkbox) {
+      const previous = Boolean(task.done);
+      const next = !previous;
+      task.done = next;
+      if (next) playTada();
+      render();
+
+      try {
+        await request(`${API}?id=eq.${encodeURIComponent(task.id)}`, {
+          method: "PATCH",
+          headers: { Prefer: "return=minimal" },
+          body: JSON.stringify({ done: next })
+        });
+        if (next && activeTasks().length > 0 && activeTasks().every((item) => item.done)) launchConfetti();
+      } catch (error) {
+        task.done = previous;
+        checkbox.checked = previous;
+        render();
+        setNotice(`Opslaan lukt niet: ${error.message}`, "error");
+      }
+    }
+
+    function openNew() {
+      editingId = null;
+      $("#dialogTitle").textContent = "Nieuwe taak";
+      taskInput.value = "";
+      dayInput.value = "OVERIG";
+      $("#deleteBtn").hidden = true;
+      dialog.showModal();
+      setTimeout(() => taskInput.focus(), 0);
+    }
+
+    function openEdit(task) {
+      editingId = task.id;
+      $("#dialogTitle").textContent = "Taak aanpassen";
+      taskInput.value = task.task;
+      dayInput.value = DAYS.includes(task.day) && task.day !== "KLAAR" ? task.day : "OVERIG";
+      $("#deleteBtn").hidden = false;
+      dialog.showModal();
+      setTimeout(() => taskInput.focus(), 0);
+    }
+
+    taskForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const text = taskInput.value.trim();
+      if (!text) return taskInput.focus();
+      const day = dayInput.value;
+      const saveBtn = $("#saveBtn");
+      saveBtn.disabled = true;
+
+      try {
+        if (editingId === null) {
+          const inserted = await request(API, {
+            method: "POST",
+            headers: { Prefer: "return=representation" },
+            body: JSON.stringify({
+              task: text,
+              day,
+              done: false,
+              week_start: currentMonday(),
+              carried_over: false
+            })
+          });
+          if (Array.isArray(inserted) && inserted[0]) tasks.push(inserted[0]);
+          else await loadTasks({ quiet: true });
+        } else {
+          await request(`${API}?id=eq.${encodeURIComponent(editingId)}`, {
+            method: "PATCH",
+            headers: { Prefer: "return=minimal" },
+            body: JSON.stringify({ task: text, day })
+          });
+          const task = tasks.find((item) => String(item.id) === String(editingId));
+          if (task) Object.assign(task, { task: text, day });
+        }
+        dialog.close();
+        render();
+      } catch (error) {
+        setNotice(`Opslaan lukt niet: ${error.message}`, "error");
+      } finally {
+        saveBtn.disabled = false;
+      }
+    });
+
+    $("#deleteBtn").addEventListener("click", async () => {
+      const task = tasks.find((item) => String(item.id) === String(editingId));
+      if (!task || !confirm(`“${task.task}” verwijderen?`)) return;
+      $("#deleteBtn").disabled = true;
+      try {
+        await request(`${API}?id=eq.${encodeURIComponent(task.id)}`, {
+          method: "DELETE",
+          headers: { Prefer: "return=minimal" }
+        });
+        tasks = tasks.filter((item) => String(item.id) !== String(task.id));
+        dialog.close();
+        render();
+      } catch (error) {
+        setNotice(`Verwijderen lukt niet: ${error.message}`, "error");
+      } finally {
+        $("#deleteBtn").disabled = false;
+      }
+    });
+
+    $("#cancelBtn").addEventListener("click", () => dialog.close());
+    $("#addBtn").addEventListener("click", openNew);
+    $("#hideBtn").addEventListener("click", () => { hideDone = !hideDone; render(); });
+    $("#refreshBtn").addEventListener("click", () => loadTasks());
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+
+    function playTada() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        audioContext ||= new AudioCtx();
+        if (audioContext.state === "suspended") audioContext.resume();
+        const now = audioContext.currentTime;
+        const notes = [261.63, 329.63, 392.00, 523.25];
+        const starts = [0, .09, .18, .29];
+        const durations = [.16, .16, .18, .62];
+
+        notes.forEach((frequency, index) => {
+          const oscillator = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+          oscillator.type = index === notes.length - 1 ? "triangle" : "sine";
+          oscillator.frequency.setValueAtTime(frequency, now + starts[index]);
+          gain.gain.setValueAtTime(.0001, now + starts[index]);
+          gain.gain.exponentialRampToValueAtTime(index === 3 ? .22 : .16, now + starts[index] + .018);
+          gain.gain.exponentialRampToValueAtTime(.0001, now + starts[index] + durations[index]);
+          oscillator.connect(gain).connect(audioContext.destination);
+          oscillator.start(now + starts[index]);
+          oscillator.stop(now + starts[index] + durations[index] + .03);
+        });
+      } catch (_) {
+        // Audio is decorative; a blocked AudioContext must never block task updates.
+      }
+    }
+
+    function launchConfetti() {
+      const host = $("#confetti");
+      host.replaceChildren();
+      const colors = ["#10b981", "#f59e0b", "#ef4444", "#3b82f6", "#8b5cf6", "#ec4899"];
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const amount = reducedMotion ? 24 : 110;
+
+      for (let i = 0; i < amount; i += 1) {
+        const piece = document.createElement("i");
+        piece.className = "confetti-piece";
+        piece.style.left = `${Math.random() * 100}%`;
+        piece.style.background = colors[i % colors.length];
+        piece.style.setProperty("--duration", `${1.8 + Math.random() * 2.2}s`);
+        piece.style.setProperty("--drift", `${-110 + Math.random() * 220}px`);
+        piece.style.setProperty("--spin", `${360 + Math.random() * 1080}deg`);
+        piece.style.animationDelay = `${Math.random() * .45}s`;
+        host.appendChild(piece);
+      }
+      setTimeout(() => host.replaceChildren(), 4700);
+    }
+
+    loadTasks();
+  </script>
+</body>
+</html>
